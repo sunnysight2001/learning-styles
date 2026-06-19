@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Style Questionnaire</title>
+<style>
+  :root{
+    --ink:#1c2230;
+    --paper:#f6f3ec;
+    --card:#ffffff;
+    --line:#d9d3c6;
+    --visual:#3a6ea5;
+    --auditory:#c2682f;
+    --kinesthetic:#4a8a5c;
+    --muted:#6b6f7a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:Georgia,"Times New Roman",serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.55;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:32px 20px 80px;}
+  header{margin-bottom:28px;border-bottom:2px solid var(--ink);padding-bottom:18px;}
+  h1{font-size:2rem;margin:0 0 6px;letter-spacing:-.5px;}
+  .sub{color:var(--muted);font-size:.95rem;margin:0;}
+  .instructions{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px 20px;
+    margin:22px 0;
+    font-size:.95rem;
+  }
+  .scale{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .scale span{
+    flex:1;min-width:150px;background:var(--paper);
+    border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:.85rem;
+  }
+  .scale b{display:block;font-size:1.05rem;}
+  section.block{margin:34px 0;}
+  .sec-head{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    text-transform:uppercase;letter-spacing:2px;font-size:.8rem;
+    color:var(--muted);margin-bottom:4px;
+  }
+  .sec-title{font-size:1.25rem;margin:0 0 16px;}
+  .q{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:10px;
+  }
+  .q p{margin:0 0 10px;font-size:.98rem;}
+  .opts{display:flex;gap:8px;}
+  .opts label{
+    flex:1;text-align:center;cursor:pointer;
+    border:1px solid var(--line);border-radius:8px;
+    padding:8px 4px;font-family:Arial,sans-serif;font-size:.82rem;
+    transition:.15s;background:var(--paper);
+  }
+  .opts input{display:none;}
+  .opts input:checked + .pill{font-weight:700;}
+  .opts label:has(input:checked){background:var(--ink);color:#fff;border-color:var(--ink);}
+  .opts .num{display:block;font-size:1.15rem;font-weight:700;}
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;}
+  button{
+    font-family:Arial,sans-serif;font-size:.95rem;font-weight:600;
+    border:none;border-radius:8px;padding:13px 22px;cursor:pointer;
+  }
+  .primary{background:var(--ink);color:#fff;}
+  .ghost{background:transparent;border:1px solid var(--ink);color:var(--ink);}
+  .primary:disabled{opacity:.45;cursor:not-allowed;}
+  #warn{color:var(--auditory);font-size:.9rem;margin-top:10px;min-height:18px;}
+  /* results */
+  #result{display:none;margin-top:40px;}
+  .res-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px;}
+  .verdict{font-size:1.4rem;margin:0 0 6px;}
+  .verdict small{display:block;font-size:.9rem;color:var(--muted);font-family:Arial,sans-serif;font-weight:400;margin-top:4px;}
+  .bar-row{margin:18px 0;}
+  .bar-label{display:flex;justify-content:space-between;font-family:Arial,sans-serif;font-size:.9rem;margin-bottom:4px;}
+  .bar{height:14px;background:var(--paper);border-radius:7px;overflow:hidden;border:1px solid var(--line);}
+  .bar i{display:block;height:100%;border-radius:7px;width:0;transition:width .6s ease;}
+  .v i{background:var(--visual);} .a i{background:var(--auditory);} .k i{background:var(--kinesthetic);}
+  .desc{font-size:.95rem;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);}
+  .name-field{margin:18px 0;}
+  .name-field input{
+    width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:8px;
+    font-family:Georgia,serif;font-size:1rem;
+  }
+  @media print{.actions,.instructions,.name-field{display:none;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Learning Style Questionnaire</h1>
+    <p class="sub">Modality preference assessment · adapted from O'Brien (1985)</p>
+  </header>
+
+  <div class="instructions">
+    Read each statement and indicate how often it applies to you. Respond to all 30 items.
+    <div class="scale">
+      <span><b>1</b> Never applies to me</span>
+      <span><b>2</b> Sometimes applies to me</span>
+      <span><b>3</b> Often applies to me</span>
+    </div>
+    <div class="name-field">
+      <input id="uname" type="text" placeholder="Your name (optional — appears on the report)">
+    </div>
+  </div>
+
+  <form id="quiz"></form>
+
+  <div class="actions">
+    <button type="button" class="primary" id="seeResult">See my result</button>
+    <button type="button" class="ghost" id="resetBtn">Reset</button>
+  </div>
+  <div id="warn"></div>
+
+  <div id="result">
+    <div class="res-card" id="resCard">
+      <h2 class="verdict" id="verdict"></h2>
+      <div class="bar-row v">
+        <div class="bar-label"><span>Visual</span><span id="vScore"></span></div>
+        <div class="bar"><i id="vBar"></i></div>
+      </div>
+      <div class="bar-row a">
+        <div class="bar-label"><span>Auditory</span><span id="aScore"></span></div>
+        <div class="bar"><i id="aBar"></i></div>
+      </div>
+      <div class="bar-row k">
+        <div class="bar-label"><span>Kinesthetic (hands-on)</span><span id="kScore"></span></div>
+        <div class="bar"><i id="kBar"></i></div>
+      </div>
+      <div class="desc" id="desc"></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="primary" id="downloadBtn">Download report</button>
+      <button type="button" class="ghost" id="printBtn">Print</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const sections = {
+  Visual: [
+    "I enjoy doodling and even my notes have lots of pictures and arrows in them.",
+    "I remember something better if I write it down.",
+    "I get lost or am late if someone tells me how to get to a new place, and I don't write down the directions.",
+    "When trying to remember someone's telephone number, or something new like that, it helps me to get a picture of it in my mind.",
+    "If I am taking a test, I can \u201Csee\u201D the textbook page and where the answer is located.",
+    "It helps me to look at the person while listening; it keeps me focused.",
+    "Using flashcards helps me to retain material for tests.",
+    "It's hard for me to understand what a person is saying when there are people talking or music playing.",
+    "It's hard for me to understand a joke when someone tells me.",
+    "It is better for me to get work done in a quiet place."
+  ],
+  Auditory: [
+    "My written work doesn't look neat to me. My papers have crossed-out words and erasures.",
+    "It helps to use my finger as a pointer when reading to keep my place.",
+    "Papers with very small print, blotchy dittos or poor copies are tough on me.",
+    "I understand how to do something if someone tells me, rather than having to read the same thing to myself.",
+    "I remember things that I hear, rather than things that I see or read.",
+    "Writing is tiring. I press down too hard with my pen or pencil.",
+    "My eyes get tired fast, even though the eye doctor says that my eyes are ok.",
+    "When I read, I mix up words that look alike, such as \u201Cthem\u201D and \u201Cthen,\u201D \u201Cbad\u201D and \u201Cdad.\u201D",
+    "It's hard for me to read other people's handwriting.",
+    "If I had the choice to learn new information through a lecture or textbook, I would choose to hear it rather than read it."
+  ],
+  Kinesthetic: [
+    "I don't like to read directions; I'd rather just start doing.",
+    "I learn best when I am shown how to do something, and I have the opportunity to do it.",
+    "Studying at a desk is not for me.",
+    "I tend to solve problems through a more trial-and-error approach, rather than from a step-by-step method.",
+    "Before I follow directions, it helps me to see someone else do it first.",
+    "I find myself needing frequent breaks while studying.",
+    "I am not skilled in giving verbal explanations or directions.",
+    "I do not become easily lost, even in strange surroundings.",
+    "I think better when I have the freedom to move around.",
+    "When I can't think of a specific word, I'll use my hands a lot and call something a \u201Cwhat-cha-ma-call-it\u201D or a \u201Cthing-a-ma-jig.\u201D"
+  ]
+};
+
+const descriptions = {
+  Visual: "You tend to learn by seeing and watching. You retain information best when it's written, drawn, or laid out visually — diagrams, notes, flashcards, and a tidy workspace work in your favour. Reading and quiet environments suit you.",
+  Auditory: "You tend to learn by listening and talking things through. Lectures, discussions, and verbal instructions stick better than written text. Saying things aloud and hearing explanations helps you retain and process information.",
+  Kinesthetic: "You tend to learn by doing and direct involvement. Hands-on practice, movement, and trial-and-error work better for you than reading or listening. You think best when active and may need frequent breaks."
+};
+
+const quiz = document.getElementById('quiz');
+const keys = Object.keys(sections);
+keys.forEach(sec => {
+  const block = document.createElement('section');
+  block.className = 'block';
+  block.innerHTML = `<div class="sec-head">Section ${keys.indexOf(sec)+1}</div>
+    <h2 class="sec-title">${sec}</h2>`;
+  sections[sec].forEach((q, i) => {
+    const name = `${sec}_${i}`;
+    const div = document.createElement('div');
+    div.className = 'q';
+    div.innerHTML = `<p>${i+1}. ${q}</p>
+      <div class="opts">
+        ${[1,2,3].map(v=>`<label><input type="radio" name="${name}" value="${v}"><span class="pill"><span class="num">${v}</span></span></label>`).join('')}
+      </div>`;
+    block.appendChild(div);
+  });
+  quiz.appendChild(block);
+});
+
+function tally(){
+  const scores = {Visual:0,Auditory:0,Kinesthetic:0};
+  let answered = 0;
+  keys.forEach(sec=>{
+    sections[sec].forEach((q,i)=>{
+      const sel = document.querySelector(`input[name="${sec}_${i}"]:checked`);
+      if(sel){scores[sec]+=parseInt(sel.value);answered++;}
+    });
+  });
+  return {scores, answered};
+}
+
+function verdictText(scores){
+  const arr = keys.map(k=>({k,v:scores[k]})).sort((a,b)=>b.v-a.v);
+  const [top, mid, low] = arr;
+  const label = {Visual:"Visual",Auditory:"Auditory",Kinesthetic:"Kinesthetic (hands-on)"};
+  if(top.v - low.v <= 2){
+    return {head:"You're a multi-sensory learner", sub:"Your scores are roughly even — no single dominant channel.", primary:null};
+  }
+  if(top.v - mid.v <= 2){
+    return {head:`Mixed preference: ${label[top.k]} & ${label[mid.k]}`, sub:"You have more than one strong learning channel.", primary:[top.k, mid.k]};
+  }
+  return {head:`Your preferred channel is ${label[top.k]}`, sub:"The higher the score, the stronger the preference.", primary:[top.k]};
+}
+
+document.getElementById('seeResult').addEventListener('click', ()=>{
+  const {scores, answered} = tally();
+  const warn = document.getElementById('warn');
+  if(answered < 30){
+    warn.textContent = `Please answer all 30 items. ${answered} of 30 completed.`;
+    return;
+  }
+  warn.textContent = '';
+  const v = verdictText(scores);
+  document.getElementById('verdict').innerHTML = `${v.head}<small>${v.sub}</small>`;
+  document.getElementById('vScore').textContent = scores.Visual + " / 30";
+  document.getElementById('aScore').textContent = scores.Auditory + " / 30";
+  document.getElementById('kScore').textContent = scores.Kinesthetic + " / 30";
+  document.getElementById('vBar').style.width = (scores.Visual/30*100)+"%";
+  document.getElementById('aBar').style.width = (scores.Auditory/30*100)+"%";
+  document.getElementById('kBar').style.width = (scores.Kinesthetic/30*100)+"%";
+  const channels = v.primary || keys;
+  document.getElementById('desc').innerHTML = channels.map(c=>`<p><b>${c}:</b> ${descriptions[c]}</p>`).join('');
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
+  window._lastResult = {scores, v, channels};
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  quiz.querySelectorAll('input').forEach(i=>i.checked=false);
+  document.getElementById('result').style.display='none';
+  document.getElementById('warn').textContent='';
+  document.getElementById('uname').value='';
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  const {scores, v, channels} = window._lastResult;
+  const name = document.getElementById('uname').value.trim() || "Anonymous";
+  const date = new Date().toLocaleDateString();
+  let txt = "LEARNING STYLE QUESTIONNAIRE — RESULT\n";
+  txt += "(adapted from O'Brien, 1985)\n";
+  txt += "=========================================\n\n";
+  txt += `Name: ${name}\nDate: ${date}\n\n`;
+  txt += "SCORES (max 30 each)\n";
+  txt += `  Visual:      ${scores.Visual} / 30\n`;
+  txt += `  Auditory:    ${scores.Auditory} / 30\n`;
+  txt += `  Kinesthetic: ${scores.Kinesthetic} / 30\n\n`;
+  txt += `RESULT: ${v.head}\n${v.sub}\n\n`;
+  txt += "WHAT THIS MEANS\n";
+  channels.forEach(c=>{ txt += `\n${c}:\n${descriptions[c]}\n`; });
+  txt += "\n-----------------------------------------\n";
+  txt += "Note: This is a directional, informal self-assessment, not a clinical diagnosis.\n";
+  const blob = new Blob([txt], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `learning-style-result-${name.replace(/\s+/g,'-').toLowerCase()}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+</script>
+</body>
+</html>
